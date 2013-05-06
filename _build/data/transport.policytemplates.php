@@ -28,23 +28,4 @@
 * @subpackage build
 */
 $templates = array();
-
-/* administrator template/policy */
-/*
-// Example from Quip by Shaun:
-
-$templates['1']= $modx->newObject('modAccessPolicyTemplate');
-$templates['1']->fromArray(array(
-    'id' => 1,
-    'name' => 'defaultComponentModeratorPolicyTemplate',
-    'description' => 'A policy for moderating defaultComponent comments.',
-    'lexicon' => 'defaultcomponent:permissions',
-    'template_group' => 1,
-));
-$permissions = include dirname(__FILE__).'/permissions/moderator.policy.php';
-if (is_array($permissions)) {
-    $templates['1']->addMany($permissions);
-} else { $modx->log(modX::LOG_LEVEL_ERROR,'Could not load defaultComponent Moderator Policy Template.'); }
-*/
-
 return $templates;

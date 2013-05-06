@@ -33,11 +33,11 @@ if ($object->xpdo) {
         case xPDOTransport::ACTION_INSTALL:
         case xPDOTransport::ACTION_UPGRADE:
             $modx =& $object->xpdo;
-            $modelPath = $modx->getOption('storelocator.core_path',null,$modx->getOption('core_path').'components/storelocator/').'model/';
-            $modx->addPackage('storelocator',$modelPath);
+            $modelPath = $modx->getOption('markergooglemaps.core_path',null,$modx->getOption('core_path').'components/markergooglemaps/').'model/';
+            $modx->addPackage('markergooglemaps',$modelPath);
 
             $manager = $modx->getManager();
-			$manager->createObjectContainer('slStore');
+			$manager->createObjectContainer('gmMarker');
             break;
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="markergooglemaps" baseClass="xPDOObject" platform="mysql" defaultEngine="MyISAM" version="1.1">
+	<object class="gmMarker" table="googlemaps_marker" extends="xPDOSimpleObject">
+		<field key="description" dbtype="varchar" precision="150" phptype="string" null="false" default="" />
+		<field key="latitude" dbtype="decimal" precision="9,6" phptype="float" null="false" default="0.000000" />
+		<field key="longitude" dbtype="decimal" precision="9,6" phptype="float" null="false" default="0.000000" />
+		<field key="resource_id" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+		<field key="sort" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+		<field key="config" dbtype="text" phptype="string" null="false" />
+		<field key="destpage_id" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="index" />
+
+		<index alias="sort" name="sort" primary="false" unique="false" type="BTREE" >
+			<column key="sort" length="" collation="A" null="false" />
+		</index>
+		<index alias="resource_id" name="resource_id" primary="false" unique="false" type="BTREE" >
+			<column key="resource_id" length="" collation="A" null="false" />
+		</index>
+		<index alias="destpage_id" name="destpage_id" primary="false" unique="false" type="BTREE" >
+			<column key="destpage_id" length="" collation="A" null="false" />
+		</index>
+	</object>
+</model>

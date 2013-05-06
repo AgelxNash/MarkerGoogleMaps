@@ -34,28 +34,28 @@ $tstart = $mtime;
 set_time_limit(0);
 
 /* define package */
-define('PKG_NAME','StoreLocator');
-define('PKG_NAME_LOWER','storelocator');
-define('PKG_VERSION','1.0.1');
-define('PKG_RELEASE','pl1');
+define('PKG_NAME','MarkerGoogleMaps');
+define('PKG_NAME_LOWER','markergooglemaps');
+define('PKG_VERSION','1.0.2');
+define('PKG_RELEASE','pl');
 
 /* define sources */
-$root = dirname(dirname(__FILE__)).'/';
+$root = dirname(__FILE__).'/';
 $sources= array (
     'root' => $root,
-    'build' => $root .'_build/',
-    'resolvers' => $root . '_build/resolvers/',
-    'data' => $root . '_build/data/',
-    'events' => $root . '_build/data/events/',
-    'permissions' => $root . '_build/data/permissions/',
-    'properties' => $root . '_build/data/properties/',
-    'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
-    'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
-    'plugins' => $root.'core/components/'.PKG_NAME_LOWER.'/elements/plugins/',
-    'snippets' => $root.'core/components/'.PKG_NAME_LOWER.'/elements/snippets/',
-    'lexicon' => $root . 'core/components/'.PKG_NAME_LOWER.'/lexicon/',
-    'docs' => $root.'core/components/'.PKG_NAME_LOWER.'/docs/',
-    'model' => $root.'core/components/'.PKG_NAME_LOWER.'/model/',
+    'build' => $root ,
+    'resolvers' => $root . 'resolvers/',
+    'data' => $root . 'data/',
+    'events' => $root . 'data/events/',
+    'permissions' => $root . 'data/permissions/',
+    'properties' => $root . 'data/properties/',
+    'source_core' => dirname($root).'/core/components/'.PKG_NAME_LOWER,
+    'source_assets' => dirname($root).'/assets/components/'.PKG_NAME_LOWER,
+    'plugins' => dirname($root).'/core/components/'.PKG_NAME_LOWER.'/elements/plugins/',
+    'snippets' => dirname($root).'/core/components/'.PKG_NAME_LOWER.'/elements/snippets/',
+    'lexicon' => dirname($root) . '/core/components/'.PKG_NAME_LOWER.'/lexicon/',
+    'docs' => dirname($root).'/core/components/'.PKG_NAME_LOWER.'/docs/',
+    'model' => dirname($root).'/core/components/'.PKG_NAME_LOWER.'/model/',
 );
 unset($root);
 
@@ -76,7 +76,7 @@ $builder->registerNamespace(PKG_NAME_LOWER,false,true,'{core_path}components/'.P
 
 // Load lexicon for properties
 $modx->getService('lexicon','modLexicon');
-$modx->lexicon->load('storelocator:properties');
+$modx->lexicon->load('MarkerGoogleMaps:properties');
 
 /* load action/menu */
 $menu = include $sources['data'].'transport.menu.php';
@@ -95,85 +95,6 @@ $vehicle= $builder->createVehicle($menu,array (
 ));
 $builder->putVehicle($vehicle);
 unset($vehicle,$action);
-/*
-/* load system settings 
-$settings = include_once $sources['data'].'transport.settings.php';
-$attributes= array(
-    xPDOTransport::UNIQUE_KEY => 'key',
-    xPDOTransport::PRESERVE_KEYS => true,
-    xPDOTransport::UPDATE_OBJECT => false,
-);
-if (!is_array($settings)) { $modx->log(modX::LOG_LEVEL_FATAL,'Adding settings failed.'); }
-foreach ($settings as $setting) {
-    $vehicle = $builder->createVehicle($setting,$attributes);
-    $builder->putVehicle($vehicle);
-}
-$modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($settings).' system settings.'); flush();
-unset($settings,$setting,$attributes);*/
-
-/* package in default access policy 
-$attributes = array (
-    xPDOTransport::PRESERVE_KEYS => false,
-    xPDOTransport::UNIQUE_KEY => array('name'),
-    xPDOTransport::UPDATE_OBJECT => true,
-);
-$policies = include $sources['data'].'transport.policies.php';
-if (!is_array($policies)) { $modx->log(modX::LOG_LEVEL_FATAL,'Adding policies failed.'); }
-foreach ($policies as $policy) {
-    $vehicle = $builder->createVehicle($policy,$attributes);
-    $builder->putVehicle($vehicle);
-}
-$modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($policies).' Access Policies.'); flush();
-unset($policies,$policy,$attributes);*/
-
-/* package in default access policy template 
-$templates = include dirname(__FILE__).'/data/transport.policytemplates.php';
-$attributes = array (
-    xPDOTransport::PRESERVE_KEYS => false,
-    xPDOTransport::UNIQUE_KEY => array('name'),
-    xPDOTransport::UPDATE_OBJECT => true,
-    xPDOTransport::RELATED_OBJECTS => true,
-    xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array (
-        'Permissions' => array (
-            xPDOTransport::PRESERVE_KEYS => false,
-            xPDOTransport::UPDATE_OBJECT => true,
-            xPDOTransport::UNIQUE_KEY => array ('template','name'),
-        ),
-    )
-);
-if (is_array($templates)) {
-    foreach ($templates as $template) {
-        $vehicle = $builder->createVehicle($template,$attributes);
-        $builder->putVehicle($vehicle);
-    }
-    $modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($templates).' Access Policy Templates.'); flush();
-} else {
-    $modx->log(modX::LOG_LEVEL_ERROR,'Could not package in Access Policy Templates.');
-}
-unset ($templates,$template,$idx,$ct,$attributes);*/
-
-/* add plugins
-$plugins = include $sources['data'].'transport.plugins.php';
-if (!is_array($plugins)) { $modx->log(modX::LOG_LEVEL_FATAL,'Adding plugins failed.'); }
-$attributes= array(
-    xPDOTransport::UNIQUE_KEY => 'name',
-    xPDOTransport::PRESERVE_KEYS => false,
-    xPDOTransport::UPDATE_OBJECT => true,
-    xPDOTransport::RELATED_OBJECTS => true,
-    xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array (
-        'PluginEvents' => array(
-            xPDOTransport::PRESERVE_KEYS => true,
-            xPDOTransport::UPDATE_OBJECT => false,
-            xPDOTransport::UNIQUE_KEY => array('pluginid','event'),
-        ),
-    ),
-);
-foreach ($plugins as $plugin) {
-    $vehicle = $builder->createVehicle($plugin, $attributes);
-    $builder->putVehicle($vehicle);
-}
-$modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($plugins).' plugins.'); flush();
-unset($plugins,$plugin,$attributes); */
 
 /* create category */
 $category= $modx->newObject('modCategory');

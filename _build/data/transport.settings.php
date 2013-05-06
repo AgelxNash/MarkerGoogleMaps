@@ -25,6 +25,4 @@
 * @package defaultcomponent
 * @subpackage build
 */
-$settings = array();
-
-return $settings;
+return array();

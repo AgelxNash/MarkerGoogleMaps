@@ -21,19 +21,7 @@
  *
  * @package StoreLocator
  */
-/**
-* @package StoreLocator
-* @subpackage build
-*/
-$snippets = array();
+ 
+if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
-    'name' => 'markergooglemaps',
-    'description' => 'markergooglemaps\'s main snippet',
-    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
-));
-$properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
-return $snippets;
+return file_get_contents('http://www.scherpontwikkeling.nl/components/markergooglemaps/about.html?premium=0');

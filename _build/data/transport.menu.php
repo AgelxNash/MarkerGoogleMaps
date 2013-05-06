@@ -30,11 +30,11 @@
 $action= $modx->newObject('modAction');
 $action->fromArray(array(
     'id' => 1,
-    'namespace' => 'storelocator',
+    'namespace' => 'markergooglemaps',
     'parent' => 0,
     'controller' => 'index',
     'haslayout' => 1,
-    'lang_topics' => 'storelocator:default',
+    'lang_topics' => 'markergooglemaps:default',
     'assets' => '',
 ),'',true,true);
 
@@ -42,8 +42,8 @@ $action->fromArray(array(
 $menu= $modx->newObject('modMenu');
 $menu->fromArray(array(
     'parent' => 'components',
-    'text' => 'storelocator',
-    'description' => 'storelocator_desc',
+    'text' => 'markergooglemaps',
+    'description' => 'markergooglemaps_desc',
     'icon' => 'images/icons/plugin.gif',
     'menuindex' => '0',
     'params' => '',

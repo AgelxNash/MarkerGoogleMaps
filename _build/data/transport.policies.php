@@ -35,20 +35,4 @@ function bld_policyFormatData($permissions) {
     return $data;
 }
 $policies = array();
-
-/*
-// Example policy from Quip component by Shaun:
-
-$policies[1]= $modx->newObject('modAccessPolicy');
-$policies[1]->fromArray(array (
-  'id' => 1,
-  'name' => 'defaultComponentModeratorPolicy',
-  'description' => 'A policy for moderating defaultComponent comments.',
-  'parent' => 0,
-  'class' => '',
-  'lexicon' => 'defaultcomponent:permissions',
-  'data' => '{"defaultcomponent.comment_approve":true,"defaultcomponent.comment_list":true,"defaultcomponent.comment_list_unapproved":true,"defaultcomponent.comment_remove":true,"defaultcomponent.comment_update":true,"defaultcomponent.thread_list":true,"defaultcomponent.thread_manage":true,"defaultcomponent.thread_remove":true,"defaultcomponent.thread_truncate":true,"defaultcomponent.thread_view":true,"defaultcomponent.thread_update":true}',
-), '', true, true);
-*/
-
 return $policies;

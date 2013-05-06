@@ -22,18 +22,13 @@
  * @package StoreLocator
  */
 /**
-* @package StoreLocator
-* @subpackage build
-*/
-$snippets = array();
+ * StoreLocator English language file
+ *
+ * @package StoreLocator
+ * @subpackage lexicon
+ */
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
-    'name' => 'markergooglemaps',
-    'description' => 'markergooglemaps\'s main snippet',
-    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
-));
-$properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
-return $snippets;
+/* Manager translations */
+$_lang['markergooglemaps'] = 'Store Locator';
+$_lang['markergooglemaps.click_to_view'] = 'Click here to view';
+$_lang['markergooglemaps.noresults'] = 'No stores found';

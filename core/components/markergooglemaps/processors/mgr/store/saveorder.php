@@ -21,19 +21,18 @@
  *
  * @package StoreLocator
  */
-/**
-* @package StoreLocator
-* @subpackage build
-*/
-$snippets = array();
+ 
+if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
-    'name' => 'markergooglemaps',
-    'description' => 'markergooglemaps\'s main snippet',
-    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
-));
-$properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
-return $snippets;
+$order = json_decode($_REQUEST['newOrder'], true);
+
+foreach($order as $key => $id) { 
+	$store = $modx->getObject('gmMarker', (int) $id);
+	
+	if ($store != null) {
+		$store->set('sort', ($key + 1));
+		$store->save();
+	}
+}
+
+return $modx->error->success();

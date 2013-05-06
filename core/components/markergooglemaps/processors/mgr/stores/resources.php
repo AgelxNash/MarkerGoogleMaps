@@ -21,19 +21,18 @@
  *
  * @package StoreLocator
  */
-/**
-* @package StoreLocator
-* @subpackage build
-*/
-$snippets = array();
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
-    'name' => 'markergooglemaps',
-    'description' => 'markergooglemaps\'s main snippet',
-    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
-));
-$properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
-return $snippets;
+if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
+
+$parents = explode(",",$modx->getOption('parents', $scriptProperties, ''));
+$resources = (array('')!=$parents) ? $modx->getCollection('modResource', array('parent:IN' => $parents)) :  $modx->getCollection('modResource');
+
+$list = array();
+if(!isset($_REQUEST['mode']) || $_REQUEST['mode']!='destpage'){
+    $list[]=array('id'=>0,'pagetitle'=>'-');
+}
+foreach ($resources as $resource) {
+    $list[] = $resource->toArray();
+}
+
+return $this->outputArray($list, sizeof($list));

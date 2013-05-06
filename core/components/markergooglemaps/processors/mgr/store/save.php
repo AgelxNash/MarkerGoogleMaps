@@ -21,19 +21,37 @@
  *
  * @package StoreLocator
  */
-/**
-* @package StoreLocator
-* @subpackage build
-*/
-$snippets = array();
+ 
+if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
-    'name' => 'markergooglemaps',
-    'description' => 'markergooglemaps\'s main snippet',
-    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
-));
-$properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
-return $snippets;
+$id = (int) $_REQUEST['id'];
+$storeData = json_decode($_REQUEST['storeConfig'], true);
+
+if ($id == 0) {
+	// Create a new store
+	$store = $modx->newObject('gmMarker');
+	
+	// Get the highest ordering store
+	$query = $modx->newQuery('gmMarker');
+	$query->limit(1);
+	$query->sortby('sort', 'DESC');
+	$highest = $modx->getObject('gmMarker', $query);
+	
+	if ($highest == null) {
+		$storeData['sort'] = 1;
+	} else {
+		$storeData['sort'] = $highest->get('sort') + 1;
+	}
+	
+} else {
+	// Update an existing store
+	$store = $modx->getObject('gmMarker', $id);
+}
+
+$store->fromArray($storeData);
+// Save the store
+$store->save();
+
+// Return it
+$storeArray = $store->toArray();
+return $modx->error->success('', $storeArray);

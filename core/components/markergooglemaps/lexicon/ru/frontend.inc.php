@@ -22,18 +22,13 @@
  * @package StoreLocator
  */
 /**
-* @package StoreLocator
-* @subpackage build
-*/
-$snippets = array();
+ * MarkerGoogleMaps Russian language file
+ *
+ * @package MarkerGoogleMaps
+ * @subpackage lexicon
+ */
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
-    'name' => 'markergooglemaps',
-    'description' => 'markergooglemaps\'s main snippet',
-    'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
-));
-$properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
-return $snippets;
+/* Manager translations */
+$_lang['markergooglemaps'] = 'Marker GoogleMaps';
+$_lang['markergooglemaps.click_to_view'] = 'Подробнее';
+$_lang['markergooglemaps.noresults'] = 'Ничего не найдено';
