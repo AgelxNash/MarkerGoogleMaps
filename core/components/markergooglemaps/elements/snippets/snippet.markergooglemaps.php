@@ -39,6 +39,11 @@ $sortDir = $modx->getOption('sortDir', $scriptProperties, 'ASC');
 $sortBy = $modx->getOption('sortBy', $scriptProperties, 'sort');
 $limit = $modx->getOption('limit', $scriptProperties, 0);
 
+$tvPrefix = $modx->getOption('tvPrefix', $scriptProperties,'tv.');
+$includeTVs = $modx->getOption('includeTVs',$scriptProperties,0);
+$prepareTVs = $modx->getOption('prepareTVs',$scriptProperties,1);
+$processTVs = $modx->getOption('processTVs',$scriptProperties,0);
+
 $page = $modx->getOption('page', $scriptProperties, $modx->resource->id);
 
 
@@ -85,11 +90,29 @@ foreach($stores as $store) {
 
 	$resource = $modx->getObject('modResource', $store->get('resource_id'));
 	
+	// Get TVs that belong to resource
+  $tvArray = array();
+  if (!empty($includeTVs)) {
+    $tvs = $resource->getMany('TemplateVars');
+    foreach($tvs as $tv) {
+      if($processTVs) {
+        $tvArray[$tvPrefix . $tv->get('name')] = $tv->renderOutput($store->get('resource_id'));
+      } else {
+        $value = $tv->getValue($store->get('resource_id'));
+        if ($prepareTVs && method_exists($tv, 'prepareOutput')) {
+          $value = $tv->prepareOutput($value);
+        }
+        $tvArray[$tvPrefix . $tv->get('name')] = $value;
+      }
+    }
+  }
+
 	// If the resource doesn't exist just skip it
 	if ($resource != null) {
 		$resourceArray = $resource->toArray();
 		$storeListOutput .= $markergooglemaps->getChunk($storeRowTpl, array_merge(
 			$resourceArray,
+			$tvArray,
 			array(
 				'store' => $store->toArray(),
 				'totalStores' => $totalStores,
@@ -99,6 +122,7 @@ foreach($stores as $store) {
 
         $storeListOutput .= $markergooglemaps->getChunk($storeInfoWindowTpl, array_merge(
 			$resourceArray,
+			$tvArray,
 			array(
 				'store' => $store->toArray(),
 				'totalStores' => $totalStores
@@ -106,6 +130,7 @@ foreach($stores as $store) {
 		));
 		$storeListOutput .= $markergooglemaps->getChunk($scriptStoreMarker, array_merge(
 			$resourceArray,
+			$tvArray,
 			array(
 				'store' => $store->toArray(),
 				'markerImage' => $markerImage

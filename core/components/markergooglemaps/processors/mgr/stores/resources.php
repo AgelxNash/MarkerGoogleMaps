@@ -24,8 +24,24 @@
 
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
+$where = array();
+
 $parents = explode(",",$modx->getOption('parents', $scriptProperties, ''));
-$resources = (array('')!=$parents) ? $modx->getCollection('modResource', array('parent:IN' => $parents)) :  $modx->getCollection('modResource');
+if(array()!=$parents){
+	$where['parent:IN'] = $parents;
+}
+
+$query = $modx->getOption('query', $scriptProperties, '');
+if(!empty($query)){
+	$where['pagetitle:LIKE'] = '%'.$query.'%';
+}
+
+$c = $modx->newQuery('modResource');
+$c->sortby($modx->getOption('sortBy', $scriptProperties, 'pagetitle'),$modx->getOption('sortDir', $scriptProperties, 'ASC'));
+if(!empty($where)){
+	$c->where($where);
+}
+$resources = $modx->getCollection('modResource', $c);
 
 $list = array();
 if(!isset($_REQUEST['mode']) || $_REQUEST['mode']!='destpage'){

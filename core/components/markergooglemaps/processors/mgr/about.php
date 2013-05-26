@@ -24,4 +24,4 @@
  
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-return file_get_contents('http://www.scherpontwikkeling.nl/components/markergooglemaps/about.html?premium=0');
+return file_get_contents('http://blog.agel-nash.ru/addon/markergooglemaps.html');

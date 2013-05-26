@@ -463,8 +463,8 @@ var slPageStores = Ext.extend(Ext.Panel, {
 						new Ext.Window({
 							title: _('markergooglemaps.about'),
 							modal: true,
-							html: '<iframe width="630" height="470" frameborder="0" src="'+gmMarker.config.connectorUrl+'?action=mgr/about&HTTP_MODAUTH='+siteId+'"></iframe>',
-							width: 640,
+							html: '<iframe width="990" height="470" frameborder="0" src="'+gmMarker.config.connectorUrl+'?action=mgr/about&HTTP_MODAUTH='+siteId+'"></iframe>',
+							width: 1000,
 							height: 480,  
 							padding: 10
 						}).show();
