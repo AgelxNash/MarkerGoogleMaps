@@ -26,9 +26,9 @@ if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->le
 
 $where = array();
 
-$parents = explode(",",$modx->getOption('parents', $scriptProperties, ''));
-if(array()!=$parents){
-	$where['parent:IN'] = $parents;
+$parents = $modx->getOption('parents', $scriptProperties, '');
+if($parents!=''){
+	$where['parent:IN'] = explode(",",$parents);
 }
 
 $query = $modx->getOption('query', $scriptProperties, '');
