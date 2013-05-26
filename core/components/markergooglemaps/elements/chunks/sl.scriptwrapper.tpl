@@ -33,23 +33,5 @@
 		infoWindow.open(storeLocatorMap, marker);
 	}
 	
-	function storeLocator_getStores(address) {
-		storeLocatorGeocoder.geocode({
-			address: address
-		}, function(results, status) {
-			if (status == google.maps.GeocoderStatus.OK) {
-				var latitude = results[0].geometry.location.lat();
-				var longitude = results[0].geometry.location.lng();
-				
-				// Set values and submit form
-				document.getElementById('storelocator-latitude').value = latitude;
-				document.getElementById('storelocator-longitude').value = longitude;
-				document.getElementById('storelocator-form').submit();
-			} else {
-				alert('[[%storelocator.address_not_found]]');
-			}
-		});
-	}
-	
 	google.maps.event.addDomListener(window, 'load', storeLocator_initialize);
 </script>

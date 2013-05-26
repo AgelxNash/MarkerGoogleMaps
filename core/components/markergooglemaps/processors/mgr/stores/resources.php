@@ -24,28 +24,21 @@
 
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-$where = array();
+$mode = (!isset($_REQUEST['mode']) || $_REQUEST['mode']!='destpage') ? 'destpage' : 'parentpage';
 
-$parents = $modx->getOption('parents', $scriptProperties, '');
-if($parents!=''){
-	$where['parent:IN'] = explode(",",$parents);
-}
-
-$query = $modx->getOption('query', $scriptProperties, '');
-if(!empty($query)){
-	$where['pagetitle:LIKE'] = '%'.$query.'%';
-}
+$where = $modx->getOption('markergooglemaps.where.'.$mode, $scriptProperties, '');
+$where = !empty($where) ? $modx->fromJSON($where) : array();
 
 $c = $modx->newQuery('modResource');
-$c->sortby($modx->getOption('sortBy', $scriptProperties, 'pagetitle'),$modx->getOption('sortDir', $scriptProperties, 'ASC'));
+$c->sortby($modx->getOption('markergooglemaps.sortBy', $scriptProperties, 'pagetitle'),$modx->getOption('markergooglemaps.sortDir', $scriptProperties, 'ASC'));
 if(!empty($where)){
 	$c->where($where);
 }
 $resources = $modx->getCollection('modResource', $c);
 
 $list = array();
-if(!isset($_REQUEST['mode']) || $_REQUEST['mode']!='destpage'){
-    $list[]=array('id'=>0,'pagetitle'=>'-');
+if($mode=='destpage'){
+	$list[]=array('id'=>0,'pagetitle'=>'-');
 }
 foreach ($resources as $resource) {
     $list[] = $resource->toArray();

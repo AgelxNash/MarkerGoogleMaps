@@ -1,1 +1,1 @@
-[[%storelocator.noresults]]
+[[%markergooglemaps.noresults]]

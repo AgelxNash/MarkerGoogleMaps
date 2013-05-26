@@ -22,7 +22,7 @@
  * @package StoreLocator
  */
 // Load the userValueList class
-$markergooglemaps = $modx->getService('markergooglemaps','markergooglemaps', $modx->getOption('markergooglemaps.core_path', null, $modx->getOption('core_path').'components/markergooglemaps/').'model/markergooglemaps/', $scriptProperties);
+$markergooglemaps = $modx->getService('MarkerGoogleMaps','MarkerGoogleMaps', $modx->getOption('markergooglemaps.core_path', null, $modx->getOption('core_path').'components/markergooglemaps/'), $scriptProperties);
 if (!($markergooglemaps instanceof markergooglemaps)) return '';
 
 // Configuration parameters
