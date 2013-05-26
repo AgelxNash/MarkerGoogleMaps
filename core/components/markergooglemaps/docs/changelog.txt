@@ -1,21 +1,15 @@
 1.0.2
 ---------------------
-- Add index in table
-- Add main resource
-- Changed query for search resource
-- Replace "," to "." into longitude and latitude
-- Fix shadow in infoWindow
-- Fix encoding in infoWindow
-- Delete form search in frontend
-- Refactoring some parameters from main snippet
-- Add Russian lexicon
+* Добавлены индексы к таблицам в базе данных
+* Добавлен выбор родительского документа, на основании которого можно делать пулы-меток
+* Изменен метод фильтрации документов для выпадающих списков в компоненте
+* Широта и долгота теперь всегда выводится с точкой
+* Исправлены CSS-стили для тени у окна infoWindow с информацией о метке
+* Исправлена проблема с кодировкой UTF-8 у окна infoWindow с информацией о метке
+* Удалена форма поиска координат с font-end'а
+* Переделаны некоторые параметры основного сниппета
+* Компонент переведен на русский язык
 
 1.0.1
 ---------------------
-- Added the no-results chunk to the elements
-- Added no-result to default lexicon
-- Changed about screen
-
-1.0
----------------------
-Initial Version
+* Форк StoreLocator версии

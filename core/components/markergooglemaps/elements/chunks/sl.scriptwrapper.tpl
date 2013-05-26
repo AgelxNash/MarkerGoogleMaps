@@ -11,7 +11,7 @@
 			zoom: [[+zoom]],
 			mapTypeId: google.maps.MapTypeId.[[+mapType]]
 		};
-		storeLocatorMap = new google.maps.Map(document.getElementById("storelocator_canvas"), mapOptions);
+		storeLocatorMap = new google.maps.Map(document.getElementById("markergooglemaps_canvas"), mapOptions);
 		
 		var infoWindow = new google.maps.InfoWindow({
 			content: null
