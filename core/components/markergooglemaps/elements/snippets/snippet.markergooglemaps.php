@@ -109,12 +109,13 @@ foreach($stores as $store) {
 
 	// If the resource doesn't exist just skip it
 	if ($resource != null) {
+		$storeArray = $store->toArray();
 		$resourceArray = $resource->toArray();
 		$storeListOutput .= $markergooglemaps->getChunk($storeRowTpl, array_merge(
 			$resourceArray,
 			$tvArray,
 			array(
-				'store' => $store->toArray(),
+				'store' => $storeArray,
 				'totalStores' => $totalStores,
 				'onclick' => 'markergooglemapsMap.setCenter(new google.maps.LatLng('.$store->get('latitude').','.$store->get('longitude').')); markergooglemapsMap.setZoom('.$storeZoom.');'
 			)
@@ -124,7 +125,7 @@ foreach($stores as $store) {
 			$resourceArray,
 			$tvArray,
 			array(
-				'store' => $store->toArray(),
+				'store' => $storeArray,
 				'totalStores' => $totalStores
 			)
 		));
@@ -132,7 +133,7 @@ foreach($stores as $store) {
 			$resourceArray,
 			$tvArray,
 			array(
-				'store' => $store->toArray(),
+				'store' => $storeArray,
 				'markerImage' => $markerImage
 			)
 		));
