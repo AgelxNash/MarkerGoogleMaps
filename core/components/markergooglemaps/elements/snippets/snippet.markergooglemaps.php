@@ -45,7 +45,15 @@ $prepareTVs = $modx->getOption('prepareTVs',$scriptProperties,1);
 $processTVs = $modx->getOption('processTVs',$scriptProperties,0);
 
 $page = $modx->getOption('page', $scriptProperties, $modx->resource->id);
-
+$page = explode(",",$page);
+$out = array();
+foreach($page as $item){
+    $tmp = trim($item);
+    if(is_numeric($tmp) && (int)$tmp>=0){ //Fix 0xfffffffff 
+        $out[]=(int)$tmp;
+    }
+}
+$page = array_unique($out);
 
 $storeRowTpl = $modx->getOption('storeRowTpl', $scriptProperties, 'sl.storerow');
 $storeInfoWindowTpl = $modx->getOption('storeInfoWindowTpl', $scriptProperties, 'sl.infowindow');
@@ -76,9 +84,9 @@ $modx->regClientStartupHTMLBlock($markergooglemaps->getChunk($scriptWrapperTpl, 
 $query = $modx->newQuery('gmMarker')
               ->sortby($sortBy, $sortDir)
               ->limit($limit);
-if($page>0){
+if(!empty($page)){
     $query->where(array(
-        'destpage_id:='=>$page,
+        'destpage_id:IN'=>$page,
     ));
 }
 $totalStores = $modx->getCount('gmMarker', $query);
