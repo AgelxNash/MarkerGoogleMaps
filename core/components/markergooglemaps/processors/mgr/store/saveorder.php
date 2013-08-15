@@ -34,5 +34,5 @@ foreach($order as $key => $id) {
 		$store->save();
 	}
 }
-
+$modx->mgmaps->clearCache();
 return $modx->error->success();

@@ -29,5 +29,6 @@ $id = (int) $_REQUEST['id'];
 $store = $modx->getObject('gmMarker', $id);
 
 $store->remove();
+$modx->mgmaps->clearCache();
 
 return $modx->error->success();

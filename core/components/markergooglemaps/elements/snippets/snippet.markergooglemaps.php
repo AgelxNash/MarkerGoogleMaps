@@ -35,6 +35,7 @@ $mapType = $modx->getOption('mapType', $scriptProperties, 'ROADMAP');
 $centerLongitude = $modx->getOption('centerLongitude', $scriptProperties, 6.61480);
 $centerLatitude = $modx->getOption('centerLatitude', $scriptProperties, 52.40441);
 $markerImage = $modx->getOption('markerImage', $scriptProperties, '0');
+
 $sortDir = $modx->getOption('sortDir', $scriptProperties, 'ASC');
 $sortBy = $modx->getOption('sortBy', $scriptProperties, 'sort');
 $limit = $modx->getOption('limit', $scriptProperties, 0);
@@ -44,16 +45,7 @@ $includeTVs = $modx->getOption('includeTVs',$scriptProperties,0);
 $prepareTVs = $modx->getOption('prepareTVs',$scriptProperties,1);
 $processTVs = $modx->getOption('processTVs',$scriptProperties,0);
 
-$page = $modx->getOption('page', $scriptProperties, $modx->resource->id);
-$page = explode(",",$page);
-$out = array();
-foreach($page as $item){
-    $tmp = trim($item);
-    if(is_numeric($tmp) && (int)$tmp>=0){ //Fix 0xfffffffff 
-        $out[]=(int)$tmp;
-    }
-}
-$page = array_unique($out);
+$page = $markergooglemaps->cleanIDs($modx->getOption('page', $scriptProperties, $modx->resource->id));
 
 $storeRowTpl = $modx->getOption('storeRowTpl', $scriptProperties, 'sl.storerow');
 $storeInfoWindowTpl = $modx->getOption('storeInfoWindowTpl', $scriptProperties, 'sl.infowindow');
@@ -63,14 +55,16 @@ $noResultsTpl = $modx->getOption('noResultsTpl', $scriptProperties, 'sl.noresult
 $scriptWrapperTpl = $modx->getOption('scriptWrapperTpl', $scriptProperties, 'sl.scriptwrapper');
 $scriptStoreMarker = $modx->getOption('scriptStoreMarker', $scriptProperties, 'sl.scriptstoremarker');
 
+$cacheName = $modx->getOption('cacheName', $scriptProperties, null);
+
 // Load lexicon
 $modx->lexicon->load('markergooglemaps:frontend');
 
 // Register the google maps API
 if ($apiKey != '') {
-	$modx->regClientStartupScript('http://maps.googleapis.com/maps/api/js?sensor=false&key='.$apiKey);
+    $modx->regClientStartupScript('http://maps.googleapis.com/maps/api/js?sensor=false&key='.$apiKey);
 } else {
-	$modx->regClientStartupScript('http://maps.googleapis.com/maps/api/js?sensor=false');
+    $modx->regClientStartupScript('http://maps.googleapis.com/maps/api/js?sensor=false');
 }
 
 $modx->regClientStartupHTMLBlock($markergooglemaps->getChunk($scriptWrapperTpl, array(
@@ -80,86 +74,113 @@ $modx->regClientStartupHTMLBlock($markergooglemaps->getChunk($scriptWrapperTpl, 
 	'mapType' => $mapType
 )));
 
-// Parse store chunks
-$query = $modx->newQuery('gmMarker')
-              ->sortby($sortBy, $sortDir)
-              ->limit($limit);
-if(!empty($page)){
-    $query->where(array(
-        'destpage_id:IN'=>$page,
-    ));
+$plh = array();
+
+if($cacheName){
+	//@TODO: load from cache
+	$plh = $markergooglemaps->getCache($cacheName);
 }
-$totalStores = $modx->getCount('gmMarker', $query);
-$stores = $modx->getCollection('gmMarker', $query);
-$storeListOutput = '';
-$i = 0;
-$matchedStores = 0;
-foreach($stores as $store) {
+if(!empty($plh)){
+	$query = $modx->newQuery('gmMarker')->sortby($sortBy, $sortDir);
+				  
+	if($limit>0){
+		$query->limit($limit);
+	}
 
-	$resource = $modx->getObject('modResource', $store->get('resource_id'));
-	
-	// Get TVs that belong to resource
-  $tvArray = array();
-  if (!empty($includeTVs)) {
-    $tvs = $resource->getMany('TemplateVars');
-    foreach($tvs as $tv) {
-      if($processTVs) {
-        $tvArray[$tvPrefix . $tv->get('name')] = $tv->renderOutput($store->get('resource_id'));
-      } else {
-        $value = $tv->getValue($store->get('resource_id'));
-        if ($prepareTVs && method_exists($tv, 'prepareOutput')) {
-          $value = $tv->prepareOutput($value);
-        }
-        $tvArray[$tvPrefix . $tv->get('name')] = $value;
-      }
-    }
-  }
+	if(!empty($page)){
+		$query->where(array(
+			'destpage_id:IN'=>$page,
+		));
+		$markergooglemaps->PageInfo($page);
+	}
 
-	// If the resource doesn't exist just skip it
-	if ($resource != null) {
-		$storeArray = $store->toArray();
-		$resourceArray = $resource->toArray();
-		$storeListOutput .= $markergooglemaps->getChunk($storeRowTpl, array_merge(
-			$resourceArray,
-			$tvArray,
-			array(
-				'store' => $storeArray,
-				'totalStores' => $totalStores,
-				'onclick' => 'markergooglemapsMap.setCenter(new google.maps.LatLng('.$store->get('latitude').','.$store->get('longitude').')); markergooglemapsMap.setZoom('.$storeZoom.');'
-			)
-		));
+	$totalStores = $modx->getCount('gmMarker', $query);
+	$stores = $modx->getCollection('gmMarker', $query);
+	$storeListOutput = '';
+	$i = 0;
+	$matchedStores = 0;
 
-        $storeListOutput .= $markergooglemaps->getChunk($storeInfoWindowTpl, array_merge(
-			$resourceArray,
-			$tvArray,
-			array(
-				'store' => $storeArray,
-				'totalStores' => $totalStores
-			)
-		));
-		$storeListOutput .= $markergooglemaps->getChunk($scriptStoreMarker, array_merge(
-			$resourceArray,
-			$tvArray,
-			array(
-				'store' => $storeArray,
-				'markerImage' => $markerImage
-			)
-		));
+	foreach($stores as $store) {
+		$resId = $store->get('resource_id');
+		$resourceArray = $tvArray = array();
+		if(empty($resId)){
+			$resource = true;
+		}else{
+			$resource = $modx->getObject('modResource', $resId);
 		
-		$i++;
-		$matchedStores++;
+			if($resource!==null){
+				// Get TVs that belong to resource
+			  if (!empty($includeTVs)) {
+				$tvs = $resource->getMany('TemplateVars');
+				foreach($tvs as $tv) {
+				  if($processTVs) {
+					$tvArray[$tvPrefix . $tv->get('name')] = $tv->renderOutput($store->get('resource_id'));
+				  } else {
+					$value = $tv->getValue($store->get('resource_id'));
+					if ($prepareTVs && method_exists($tv, 'prepareOutput')) {
+					  $value = $tv->prepareOutput($value);
+					}
+					$tvArray[$tvPrefix . $tv->get('name')] = $value;
+				  }
+				}
+			  }
+				$resourceArray = $resource->toArray();
+			}
+		}
+		
+		if($resource!==null){
+			$storeArray = $store->toArray();
+			$docInfo = $markergooglemaps->getPageInfo($store->get('destpage_id'));
+			$storeListOutput .= $markergooglemaps->getChunk($storeRowTpl, array_merge(
+				$resourceArray,
+				$tvArray,
+				array(
+					'pageInfo'=> $docInfo,
+					'store' => $storeArray,
+					'totalStores' => $totalStores,
+					'onclick' => 'markergooglemapsMap.setCenter(new google.maps.LatLng('.$store->get('latitude').','.$store->get('longitude').')); markergooglemapsMap.setZoom('.$storeZoom.');'
+				)
+			));
+
+			$storeListOutput .= $markergooglemaps->getChunk($storeInfoWindowTpl, array_merge(
+				$resourceArray,
+				$tvArray,
+				array(
+					'pageInfo'=> $docInfo,
+					'store' => $storeArray,
+					'totalStores' => $totalStores
+				)
+			));
+			$storeListOutput .= $markergooglemaps->getChunk($scriptStoreMarker, array_merge(
+				$resourceArray,
+				$tvArray,
+				array(
+					'pageInfo'=> $docInfo,
+					'store' => $storeArray,
+					'markerImage' => $markerImage
+				)
+			));
+				
+			$i++;
+			$matchedStores++;
+		}
+	}
+	 
+	// Nothing is found
+	if ($i == 0) {
+		$storeListOutput = $markergooglemaps->getChunk($noResultsTpl);
+	}
+	
+	$plh = array(
+		'map' => "<div id=\"markergooglemaps_canvas\" style=\"width: {$width}px; height: {$height}px;\"></div><style>#markergooglemaps_canvas img{max-width: none;}</style>",
+		'storeList' => $storeListOutput,
+		'totalStores' => $totalStores,
+		'matchedStores' => $matchedStores
+	);
+	
+	if($cacheName){
+		$markergooglemaps->setCache($cacheName,$plh);
 	}
 }
- 
-// Nothing is found
-if ($i == 0) {
-	$storeListOutput = $markergooglemaps->getChunk($noResultsTpl);
-}
 
-// Parse output to place holders
-$modx->toPlaceHolders(array(
-	'map' => "<div id=\"markergooglemaps_canvas\" style=\"width: {$width}px; height: {$height}px;\"></div><style>#markergooglemaps_canvas img{max-width: none;}</style>",
-	'storeList' => $storeListOutput,
-	'totalStores' => $totalStores,
-	'matchedStores' => $matchedStores
-), 'markergooglemaps');
+$modx->toPlaceHolders($plh, 'markergooglemaps');

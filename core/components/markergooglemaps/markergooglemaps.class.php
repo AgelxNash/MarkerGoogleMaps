@@ -46,6 +46,11 @@ class MarkerGoogleMaps {
      */
     public $controller = null;
 
+	private $chunks = array();
+	private $pageInfo = array();
+	private $_cacheConfig = array();
+	const CACHE_KEY = 'markergooglemaps';
+	
     function __construct(modX &$modx,array $config = array()) {
         $this->modx =& $modx;
 
@@ -72,6 +77,28 @@ class MarkerGoogleMaps {
         if ($this->modx->lexicon) {
             $this->modx->lexicon->load('markergooglemaps:default');
         }
+		
+		$this->_cacheConfig = array(
+			xPDO::OPT_CACHE_KEY => $modx->getOption(
+				'cache_source', 
+				$config, 
+				self::CACHE_KEY
+			),
+			xPDO::OPT_CACHE_HANDLER => $modx->getOption(
+				'cache_source_markergooglemaps', 
+				$config, 
+				$modx->getOption(xPDO::OPT_CACHE_HANDLER)
+			),
+			xPDO::OPT_CACHE_FORMAT => (integer) $modx->getOption(
+				'cache_resource_format', 
+				$config, 
+				$modx->getOption(
+					xPDO::OPT_CACHE_FORMAT, 
+					$config, 
+					xPDOCacheManager::CACHE_PHP
+				)
+			)
+		);
     }
 
     /**
@@ -94,7 +121,16 @@ class MarkerGoogleMaps {
         }
         return $output;
     }
-    
+    public function getCache($name){
+		return $this->modx->cacheManager->get($name,$this->_cacheConfig);
+	}
+	public function setCache($name,$data){
+		return $this->modx->cacheManager->set($name, $data, 0, $this->_cacheConfig);
+	}
+	public function clearCache(){
+		$path = $this->_cacheConfig[xPDO::OPT_CACHE_KEY];
+		return $this->modx->cacheManager->clearCache(array($path));
+	}
     /**
      * Load the appropriate controller
      * @param string $controller
@@ -135,20 +171,25 @@ class MarkerGoogleMaps {
     */
     public function getChunk($name,$properties = array()) {
         $chunk = null;
-        if (!isset($this->chunks[$name])) {
-            $chunk = $this->modx->getObject('modChunk',array('name' => $name),true);
-            if (empty($chunk)) {
-                $chunk = $this->_getTplChunk($name);
-                if ($chunk == false) return false;
-            }
-            $this->chunks[$name] = $chunk->getContent();
-        } else {
-            $o = $this->chunks[$name];
-            $chunk = $this->modx->newObject('modChunk');
-            $chunk->setContent($o);
-        }
-        $chunk->setCacheable(false);
-        return $chunk->process($properties);
+		if(!empty($name)){
+			if (!isset($this->chunks[$name])) {
+				$chunk = $this->modx->getObject('modChunk',array('name' => $name),true);
+				if (empty($chunk)) {
+					$chunk = $this->_getTplChunk($name);
+					if ($chunk == false) return false;
+				}
+				$this->chunks[$name] = $chunk->getContent();
+			} else {
+				$o = $this->chunks[$name];
+				$chunk = $this->modx->newObject('modChunk');
+				$chunk->setContent($o);
+			}
+			$chunk->setCacheable(false);
+			$out = $chunk->process($properties);
+		}else{
+			$out = '';
+		}
+        return $out;
     }
 	
     /**
@@ -174,4 +215,37 @@ class MarkerGoogleMaps {
         }
         return $chunk;
     }
+	public function getPageInfo($id){
+		return isset($this->pageInfo[$id]) ? $this->pageInfo[$id] : array();
+	}
+	public function PageInfo(array $ids){
+		$this->pageInfo = array();
+		if(is_array($ids) && !empty($ids)){
+			if($ids == array($this->modx->resource->get('id'))){
+				$this->pageInfo[$this->modx->resource->get('id')] = $this->modx->resource->toArray();
+			}else{
+				$q = $this->modx->newQuery("modResource")->where("id:IN", $ids);
+				$q = $this->modx->getCollection("modResource",$q);
+				foreach($q as $page){
+					$this->pageInfo[$page->get('id')] = $page->toArray();
+				}
+			}
+		}
+		return $this->pageInfo;
+	}
+	final public function cleanIDs($IDs,$sep=',') {
+        $out=array();
+        if(!is_array($IDs)){
+            $IDs=explode($sep,$IDs);
+        }
+        foreach($IDs as $item){
+            $item = trim($item);
+            if(is_numeric($item) && (int)$item>=0){ //Fix 0xfffffffff 
+                $out[]=(int)$item;
+            }
+        }
+        $out = array_unique($out);
+		return $out;
+	}
+	
 }

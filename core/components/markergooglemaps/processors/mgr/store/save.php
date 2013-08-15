@@ -54,4 +54,6 @@ $store->save();
 
 // Return it
 $storeArray = $store->toArray();
+
+$modx->mgmaps->clearCache();
 return $modx->error->success('', $storeArray);
