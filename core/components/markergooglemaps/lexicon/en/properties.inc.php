@@ -55,3 +55,4 @@ $_lang['markergooglemaps.satellite'] = 'This map type displays satellite images'
 $_lang['markergooglemaps.terrain'] = 'This map type displays maps with physical features such as terrain and vegetation';
 $_lang['markergooglemaps.asc'] = 'Sort ascending';
 $_lang['markergooglemaps.desc'] = 'Sort descending';
+$_lang['markergooglemaps.prop_cacheName_desc'] = 'Cache name';

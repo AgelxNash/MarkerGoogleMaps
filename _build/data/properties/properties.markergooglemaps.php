@@ -180,6 +180,14 @@ $properties = array(
         'value' => 'sl.scriptstoremarker',
         'lexicon' => 'markergooglemaps:properties',
     ),
+	array(
+        'name' => 'cacheName',
+        'desc' => 'markergooglemaps.prop_cacheName_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'markergooglemaps:properties',
+    ),
 );
 
 return $properties;
