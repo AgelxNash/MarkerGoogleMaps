@@ -36,7 +36,7 @@ set_time_limit(0);
 /* define package */
 define('PKG_NAME','MarkerGoogleMaps');
 define('PKG_NAME_LOWER','markergooglemaps');
-define('PKG_VERSION','1.0.3');
+define('PKG_VERSION','1.0.5');
 define('PKG_RELEASE','pl');
 
 /* define sources */
