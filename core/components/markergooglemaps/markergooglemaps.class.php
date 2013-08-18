@@ -45,7 +45,7 @@ class MarkerGoogleMaps {
      * @var markergooglemapsController $controller
      */
     public $controller = null;
-
+    private $_cacheEmptyField = array();
 	private $chunks = array();
 	private $pageInfo = array();
 	private $_cacheConfig = array();
@@ -169,29 +169,41 @@ class MarkerGoogleMaps {
     * @param array $properties The properties for the Chunk
     * @return string The processed content of the Chunk
     */
-    public function getChunk($name,$properties = array()) {
+    public function _getChunk($name,$properties = array()) {
         $chunk = null;
-		if(!empty($name)){
-			if (!isset($this->chunks[$name])) {
-				$chunk = $this->modx->getObject('modChunk',array('name' => $name),true);
-				if (empty($chunk)) {
-					$chunk = $this->_getTplChunk($name);
-					if ($chunk == false) return false;
-				}
-				$this->chunks[$name] = $chunk->getContent();
-			} else {
-				$o = $this->chunks[$name];
-				$chunk = $this->modx->newObject('modChunk');
-				$chunk->setContent($o);
-			}
-			$chunk->setCacheable(false);
-			$out = $chunk->process($properties);
-		}else{
-			$out = '';
-		}
+        if (!isset($this->chunks[$name])) {
+            $chunk = $this->modx->getObject('modChunk',array('name' => $name), false);
+            if (empty($chunk)) {
+                $chunk = $this->_getTplChunk($name);
+                if ($chunk == false) return false;
+            }
+            $this->chunks[$name] = $chunk->getContent();
+        } else {
+            $o = $this->chunks[$name];
+            $chunk = $this->modx->newObject('modChunk');
+            $chunk->setContent($o);
+        }
+        $chunk->setCacheable(false);
+        return $chunk;
+    }
+    public function getChunk($name,$properties = array()){
+        if(!empty($name)){
+            $chunk = $this->_getChunk($name);
+            if(is_object($chunk)){
+                $plh = $this->getPlh($properties);
+                $out = $chunk->getContent();
+                $out = str_replace(array_keys($plh), array_values($plh), $out);
+                if(false!==($pos=strpos($out,"[[+"))){
+                    echo $name." - ".$pos."<br />";
+                    $chunk->setContent($out);
+                    $out = $chunk->process($properties);
+                }
+            }
+        }else{
+            $out = '';
+        }
         return $out;
     }
-	
     /**
     * Returns a modChunk object from a template file.
     *
@@ -215,9 +227,23 @@ class MarkerGoogleMaps {
         }
         return $chunk;
     }
+
+    private function getPlh($data,$prefix=''){
+        $out = array();
+        foreach($data as $name=>$item){
+            if(is_array($item)){
+                $out = array_merge($out,$this->getPlh($item,$name));
+            }else{
+                $tmp = "[[+".(!empty($prefix) ? $prefix."." : "") . $name."]]";
+                $out[$tmp] = $item;
+            }
+        }
+        return $out;
+    }
 	public function getPageInfo($id){
 		return isset($this->pageInfo[$id]) ? $this->pageInfo[$id] : array();
 	}
+
 	public function PageInfo(array $ids){
 		$this->pageInfo = array();
 		if(is_array($ids) && !empty($ids)){
@@ -233,6 +259,38 @@ class MarkerGoogleMaps {
 		}
 		return $this->pageInfo;
 	}
+    public function checkProps($scriptProperties){
+        $scriptProperties['apiKey'] = $this->modx->getOption('apiKey', $scriptProperties, $this->modx->getOption('markergooglemaps.apiKey'));
+        $scriptProperties['zoom'] = $this->modx->getOption('zoom', $scriptProperties, 8);
+        $scriptProperties['storeZoom'] = $this->modx->getOption('storeZoom', $scriptProperties, 13);
+        $scriptProperties['width'] = $this->modx->getOption('width', $scriptProperties, 300);
+        $scriptProperties['height'] = $this->modx->getOption('height', $scriptProperties, 400);
+        $scriptProperties['mapType'] = $this->modx->getOption('mapType', $scriptProperties, 'ROADMAP');
+        $scriptProperties['centerLongitude'] = $this->modx->getOption('centerLongitude', $scriptProperties, 6.61480);
+        $scriptProperties['centerLatitude'] = $this->modx->getOption('centerLatitude', $scriptProperties, 52.40441);
+        $scriptProperties['markerImage'] = $this->modx->getOption('markerImage', $scriptProperties, '');
+
+        $scriptProperties['sortDir'] = $this->modx->getOption('sortDir', $scriptProperties, 'ASC');
+        $scriptProperties['sortBy'] = $this->modx->getOption('sortBy', $scriptProperties, 'sort');
+        $scriptProperties['limit'] = $this->modx->getOption('limit', $scriptProperties, 0);
+
+        $scriptProperties['tvPrefix'] = $this->modx->getOption('tvPrefix', $scriptProperties,'tv.');
+        $scriptProperties['includeTVs'] = $this->modx->getOption('includeTVs',$scriptProperties,0);
+        $scriptProperties['prepareTVs'] = $this->modx->getOption('prepareTVs',$scriptProperties,1);
+        $scriptProperties['processTVs'] = $this->modx->getOption('processTVs',$scriptProperties,0);
+        $scriptProperties['where'] = $this->modx->getOption('where',$scriptProperties,'');
+
+        $scriptProperties['page'] = $this->cleanIDs($this->modx->getOption('page', $scriptProperties, $this->modx->resource->id));
+
+        $scriptProperties['markerListTpl'] = $this->modx->getOption('markerListTpl', $scriptProperties,'sl.markerlist');
+        $scriptProperties['noResultsTpl'] = $this->modx->getOption('noResultsTpl', $scriptProperties, 'sl.noresultstpl');
+        $scriptProperties['scriptWrapperTpl'] = $this->modx->getOption('scriptWrapperTpl', $scriptProperties, 'sl.scriptwrapper');
+
+        $scriptProperties['autoPosition'] = $this->modx->getOption('autoPosition', $scriptProperties, '1');
+        $scriptProperties['cacheName'] = $this->modx->getOption('cacheName', $scriptProperties, null);
+        $scriptProperties['jsName'] = $this->modx->getOption('jsName', $scriptProperties, 'mgmaps.js');
+        return $scriptProperties;
+    }
 	final public function cleanIDs($IDs,$sep=',') {
         $out=array();
         if(!is_array($IDs)){
@@ -247,5 +305,46 @@ class MarkerGoogleMaps {
         $out = array_unique($out);
 		return $out;
 	}
-	
+	public function loadFront($prop){
+        $this->modx->lexicon->load('markergooglemaps:frontend');
+        $jMaps = 'http://maps.googleapis.com/maps/api/js?sensor=false';
+        if ($prop['apiKey'] != '') {
+            $jMaps .= '&key='.$prop['apiKey'];
+        }
+        $this->modx->regClientStartupScript($jMaps);
+        $this->modx->regClientStartupScript($this->config['jsUrl'].$prop['jsName']);
+    }
+
+    public function getQuery($prop){
+        $query = $this->modx->newQuery('gmMarker')->sortby($prop['sortBy'], $prop['sortDir']);
+        if($prop['limit']>0){
+            $query->limit($prop['limit']);
+        }
+        $where = $this->modx->fromJSON($prop['where']);
+        if(!is_array($where)){
+            $where = array();
+        }
+        if(!empty($page)){
+            array_merge($where, array(
+                'destpage_id:IN'=>$page
+            ));
+        }
+        if(!empty($where)){
+            $query->where($where);
+        }
+
+        $query->innerJoin("modResource","modResource","modResource.id = gmMarker.destpage_id");
+        $query->select(array(
+            $this->modx->getSelectColumns('modResource','modResource','',array('id'),true),
+            $this->modx->getSelectColumns('gmMarker','gmMarker')
+        ));
+        return $query;
+    }
+    public function getEmptyFields($class){
+        if(!isset($this->_cacheEmptyField[$class])){
+            $data = array_keys($this->modx->getFieldMeta($class));
+            $this->_cacheEmptyField[$class] = array_fill_keys($data, '');
+        }
+        return $this->_cacheEmptyField[$class];
+    }
 }

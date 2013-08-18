@@ -31,14 +31,19 @@ foreach ($stores as $store) {
 	$storeArray = $store->toArray();
 
     $page=$modx->getObject('modResource', array('id'=>$storeArray['destpage_id']));
-    $storeArray['destpage_id'] = $page->get('pagetitle');
+    $storeArray['resource_id'] = '-';
+    $storeArray['destpage_id'] = '-';
+    if($page instanceof modResource){
+        $storeArray['destpage_id'] = $page->get('pagetitle');
 
-    if($storeArray['resource_id']!='0'){
-        $page=$modx->getObject('modResource', array('id'=>$storeArray['resource_id']));
-        $storeArray['resource_id'] = $page->get('pagetitle');
-    }else{
-        $storeArray['resource_id'] = '-';
+        if($storeArray['resource_id']!='0'){
+            $page=$modx->getObject('modResource', array('id'=>$storeArray['resource_id']));
+            if($page instanceof modResource){
+                $storeArray['resource_id'] = $page->get('pagetitle');
+            }
+        }
     }
+
     $list[] = $storeArray;
 }
 
