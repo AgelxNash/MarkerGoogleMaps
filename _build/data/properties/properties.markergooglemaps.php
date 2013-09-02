@@ -108,6 +108,14 @@ $properties = array(
         'lexicon' => 'markergooglemaps:properties',
     ),
     array(
+        'name' => 'autoPosition',
+        'desc' => 'markergooglemaps.prop_autoPosition_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '1',
+        'lexicon' => 'markergooglemaps:properties',
+    ),
+    array(
         'name' => 'markerImage',
         'desc' => 'markergooglemaps.prop_markerimage_desc',
         'type' => 'textfield',
@@ -141,19 +149,11 @@ $properties = array(
         'lexicon' => 'markergooglemaps:properties',
     ),
     array(
-        'name' => 'storeRowTpl',
-        'desc' => 'markergooglemaps.prop_storerowtpl_desc',
+        'name' => 'markerListTpl',
+        'desc' => 'markergooglemaps.prop_markerlisttpl_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => 'sl.storerow',
-        'lexicon' => 'markergooglemaps:properties',
-    ),
-    array(
-        'name' => 'storeInfoWindowTpl',
-        'desc' => 'markergooglemaps.prop_storeinfowindowtpl_desc',
-        'type' => 'textfield',
-        'options' => '',
-        'value' => 'sl.infowindow',
+        'value' => 'sl.markerlist',
         'lexicon' => 'markergooglemaps:properties',
     ),
     array(
@@ -170,14 +170,6 @@ $properties = array(
         'type' => 'textfield',
         'options' => '',
         'value' => 'sl.scriptwrapper',
-        'lexicon' => 'markergooglemaps:properties',
-    ),
-    array(
-        'name' => 'scriptStoreMarker',
-        'desc' => 'markergooglemaps.prop_scriptstoremarker_desc',
-        'type' => 'textfield',
-        'options' => '',
-        'value' => 'sl.scriptstoremarker',
         'lexicon' => 'markergooglemaps:properties',
     ),
 	array(

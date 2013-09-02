@@ -288,7 +288,7 @@ class MarkerGoogleMaps {
 
         $scriptProperties['autoPosition'] = $this->modx->getOption('autoPosition', $scriptProperties, '1');
         $scriptProperties['cacheName'] = $this->modx->getOption('cacheName', $scriptProperties, null);
-        $scriptProperties['jsName'] = $this->modx->getOption('jsName', $scriptProperties, 'mgmaps.js');
+        $scriptProperties['jsName'] = $this->modx->getOption('jsName', $scriptProperties, '[[+jsUrl]]mgmaps.js');
         return $scriptProperties;
     }
 	final public function cleanIDs($IDs,$sep=',') {
@@ -312,7 +312,7 @@ class MarkerGoogleMaps {
             $jMaps .= '&key='.$prop['apiKey'];
         }
         $this->modx->regClientStartupScript($jMaps);
-        $this->modx->regClientStartupScript($this->config['jsUrl'].$prop['jsName']);
+        $this->modx->regClientStartupScript(str_replace("[[+jsUrl]]", $this->config['jsUrl'], $prop['jsName']));
     }
 
     public function getQuery($prop){
