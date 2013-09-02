@@ -106,9 +106,20 @@ $modx->log(modX::LOG_LEVEL_INFO,'Packaged in category.'); flush();
 $snippets = include $sources['data'].'transport.snippets.php';
 if (is_array($snippets)) {
     $category->addMany($snippets,'Snippets');
-} else { $modx->log(modX::LOG_LEVEL_FATAL,'Adding snippets failed.'); }
-$modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($snippets).' snippets.'); flush();
+    $modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($snippets).' snippets.'); flush();
+} else {
+    $modx->log(modX::LOG_LEVEL_FATAL,'Adding snippets failed.');
+}
 unset($snippets);
+
+
+$plugins = include $sources['data'].'transport.plugins.php';
+if (is_array($plugins)) {
+    $category->addMany($plugins);
+    $modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($plugins).' plugins.'); flush();
+} else {
+    $modx->log(modX::LOG_LEVEL_ERROR,'Could not package in plugins.');
+}
 
 /* create category vehicle */
 $attr = array(
@@ -118,6 +129,11 @@ $attr = array(
     xPDOTransport::RELATED_OBJECTS => true,
     xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array (
         'Snippets' => array(
+            xPDOTransport::PRESERVE_KEYS => false,
+            xPDOTransport::UPDATE_OBJECT => true,
+            xPDOTransport::UNIQUE_KEY => 'name',
+        ),
+        'Plugins' => array (
             xPDOTransport::PRESERVE_KEYS => false,
             xPDOTransport::UPDATE_OBJECT => true,
             xPDOTransport::UNIQUE_KEY => 'name',

@@ -27,12 +27,6 @@
 * @package defaultcomponent
 * @subpackage build
 */
-function bld_policyFormatData($permissions) {
-    $data = array();
-    foreach ($permissions as $permission) {
-        $data[$permission->get('name')] = true;
-    }
-    return $data;
-}
+
 $policies = array();
 return $policies;
