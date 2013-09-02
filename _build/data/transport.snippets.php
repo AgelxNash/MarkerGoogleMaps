@@ -27,13 +27,14 @@
 */
 $snippets = array();
 
-$snippets[1]= $modx->newObject('modSnippet');
-$snippets[1]->fromArray(array(
-    'id' => 1,
+$snippet= $modx->newObject('modSnippet');
+$snippet->fromArray(array(
     'name' => 'markergooglemaps',
     'description' => 'markergooglemaps\'s main snippet',
     'snippet' => getSnippetContent($sources['source_core'].'/elements/snippets/snippet.markergooglemaps.php'),
 ));
 $properties = include $sources['data'].'properties/properties.markergooglemaps.php';
-$snippets[1]->setProperties($properties);
+$snippet->setProperties($properties);
+
+$snippets[]=$snippet;
 return $snippets;
