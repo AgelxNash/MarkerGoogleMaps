@@ -21,26 +21,30 @@
  *
  * @package StoreLocator
  */
- 
+
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
 $stores = $modx->getCollection('gmMarker');
-  
+
 $list = array();
 foreach ($stores as $store) {
-	$storeArray = $store->toArray();
+    $storeArray = $store->toArray();
 
-    $page=$modx->getObject('modResource', array('id'=>$storeArray['destpage_id']));
-    $storeArray['resource_id'] = '-';
+    $dest = $storeArray['destpage_id'];
     $storeArray['destpage_id'] = '-';
-    if($page instanceof modResource){
-        $storeArray['destpage_id'] = $page->get('pagetitle');
+    if($dest!='0'){
+        $page=$modx->getObject('modResource', array('id'=>$dest));
+        if($page instanceof modResource){
+            $storeArray['destpage_id'] = $page->get('pagetitle');
+        }
+    }
 
-        if($storeArray['resource_id']!='0'){
-            $page=$modx->getObject('modResource', array('id'=>$storeArray['resource_id']));
-            if($page instanceof modResource){
-                $storeArray['resource_id'] = $page->get('pagetitle');
-            }
+    $dest = $storeArray['resource_id'];
+    $storeArray['resource_id'] = '-';
+    if($dest!='0'){
+        $page=$modx->getObject('modResource', array('id'=>$dest));
+        if($page instanceof modResource){
+            $storeArray['resource_id'] = $page->get('pagetitle');
         }
     }
 
