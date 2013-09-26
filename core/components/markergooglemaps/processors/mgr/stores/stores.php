@@ -21,33 +21,18 @@
  *
  * @package StoreLocator
  */
-
+ 
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
+include_once(dirname(dirname(dirname(dirname(__FILE__))))."/cacheObject.class.php");
+$cacheObj = cacheObject::getInstance($modx);
 
 $stores = $modx->getCollection('gmMarker');
 
 $list = array();
 foreach ($stores as $store) {
-    $storeArray = $store->toArray();
-
-    $dest = $storeArray['destpage_id'];
-    $storeArray['destpage_id'] = '-';
-    if($dest!='0'){
-        $page=$modx->getObject('modResource', array('id'=>$dest));
-        if($page instanceof modResource){
-            $storeArray['destpage_id'] = $page->get('pagetitle');
-        }
-    }
-
-    $dest = $storeArray['resource_id'];
-    $storeArray['resource_id'] = '-';
-    if($dest!='0'){
-        $page=$modx->getObject('modResource', array('id'=>$dest));
-        if($page instanceof modResource){
-            $storeArray['resource_id'] = $page->get('pagetitle');
-        }
-    }
-
+	$storeArray = $store->toArray();
+	$storeArray['destpage_id'] = $cacheObj->getData($storeArray['destpage_id']);
+	$storeArray['resource_id'] = $cacheObj->getData($storeArray['resource_id']);
     $list[] = $storeArray;
 }
 

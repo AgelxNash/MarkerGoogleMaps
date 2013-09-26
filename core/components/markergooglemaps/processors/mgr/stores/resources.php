@@ -41,7 +41,8 @@ if($mode=='destpage'){
 	$list[]=array('id'=>0,'pagetitle'=>'-');
 }
 foreach ($resources as $resource) {
-    $list[] = $resource->toArray();
+    $tmp = $resource->toArray();
+	$list[] = array('id'=>$tmp['id'], 'pagetitle'=>$tmp['pagetitle']);
 }
 
 return $this->outputArray($list, sizeof($list));
