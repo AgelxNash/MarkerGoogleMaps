@@ -120,7 +120,7 @@ $properties = array(
         'desc' => 'markergooglemaps.prop_markerimage_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => '0',
+        'value' => '',
         'lexicon' => 'markergooglemaps:properties',
     ),
     array(
