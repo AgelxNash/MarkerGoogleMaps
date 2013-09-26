@@ -324,9 +324,9 @@ class MarkerGoogleMaps {
         if(!is_array($where)){
             $where = array();
         }
-        if(!empty($page)){
-            array_merge($where, array(
-                'destpage_id:IN'=>$page
+        if(!empty($prop['page'])){
+            $where = array_merge($where, array(
+                'destpage_id:IN'=> explode(",", $prop['page'])
             ));
         }
         if(!empty($where)){
