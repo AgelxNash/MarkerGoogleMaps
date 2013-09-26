@@ -24,10 +24,13 @@
 
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-$id = (int) $_REQUEST['id'];
+include_once(dirname(dirname(dirname(dirname(__FILE__))))."/cacheObject.class.php");
+$cacheObj = cacheObject::getInstance($modx);
 
-$store = $modx->getObject('gmMarker', $id);
+$id = isset($data['id']) ? $data['id'] : $_REQUEST['id'];
+$store = $modx->getObject('gmMarker', (int)$id);
 
 $storeArray = $store->toArray();
-
+$storeArray['destpage_id'] = $cacheObj->getData($storeArray['destpage_id'], 'id');
+$storeArray['resource_id'] = $cacheObj->getData($storeArray['resource_id'], 'id');
 return $modx->error->success('', $storeArray);

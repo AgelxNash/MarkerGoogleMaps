@@ -60,3 +60,4 @@ $_lang['markergooglemaps.destpage'] = 'Основной документ';
 $_lang['markergooglemaps.dest_desc'] = 'Выберите документ, к которому будет привязан данный маркер';
 $_lang['markergooglemaps.destpage_id'] = 'Выберите документ';
 $_lang['markergooglemaps.address_not_found'] = 'Адрес на найден';
+$_lang['markergooglemaps.error_update_store'] = 'Ошибка во время обновления/создания маркера';

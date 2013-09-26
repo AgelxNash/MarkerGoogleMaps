@@ -31,8 +31,24 @@ $stores = $modx->getCollection('gmMarker');
 $list = array();
 foreach ($stores as $store) {
 	$storeArray = $store->toArray();
-	$storeArray['destpage_id'] = $cacheObj->getData($storeArray['destpage_id']);
-	$storeArray['resource_id'] = $cacheObj->getData($storeArray['resource_id']);
+	$update = false;
+	
+	$pageId = $storeArray['destpage_id'];
+	$storeArray['destpage_id'] = $cacheObj->getData($pageId);
+	if($cacheObj->getData($pageId, 'id') != $pageId){
+		$store->set('destpage_id', 0);
+		$update=true;
+	}
+	$pageId = $storeArray['resource_id'];
+	$storeArray['resource_id'] = $cacheObj->getData($pageId);
+	if($cacheObj->getData($pageId, 'id') != $pageId){
+		$store->set('resource_id', 0);
+		$update=true;
+	}
+	
+	if($update){
+		$store->save();
+	}
     $list[] = $storeArray;
 }
 

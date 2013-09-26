@@ -60,3 +60,4 @@ $_lang['markergooglemaps.destpage'] = 'Main document';
 $_lang['markergooglemaps.dest_desc'] = 'Select the document to which you will apply this marker';
 $_lang['markergooglemaps.destpage_id'] = 'Select document';
 $_lang['markergooglemaps.address_not_found'] = 'Address not found';
+$_lang['markergooglemaps.error_update_store'] = 'Error during update/create a marker';

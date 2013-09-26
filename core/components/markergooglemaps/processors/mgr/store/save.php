@@ -24,36 +24,48 @@
  
 if (!$modx->user->isAuthenticated('mgr')) return $modx->error->failure($modx->lexicon('permission_denied'));
 
-$id = (int) $_REQUEST['id'];
-$storeData = json_decode($_REQUEST['storeConfig'], true);
+include_once(dirname(dirname(dirname(dirname(__FILE__))))."/cacheObject.class.php");
+$cacheObj = cacheObject::getInstance($modx);
+
+
+$id = isset($data['id']) ? $data['id'] : $_REQUEST['id'];
+$id = (int)$id;
+$config = isset($data['storeConfig']) ? $data['storeConfig'] : $_REQUEST['storeConfig'];
+$storeData = json_decode($config, true);
 
 if ($id == 0) {
 	// Create a new store
 	$store = $modx->newObject('gmMarker');
 	
-	// Get the highest ordering store
-	$query = $modx->newQuery('gmMarker');
-	$query->limit(1);
-	$query->sortby('sort', 'DESC');
-	$highest = $modx->getObject('gmMarker', $query);
+	$highest = $modx->getObject(
+		'gmMarker',
+		$modx->newQuery('gmMarker')
+			->limit(1)
+			->sortby('sort', 'DESC')
+	);
 	
-	if ($highest == null) {
-		$storeData['sort'] = 1;
-	} else {
-		$storeData['sort'] = $highest->get('sort') + 1;
-	}
+	$storeData['sort'] = 1;
+	$storeData['sort'] += ($highest == null) ? 0 : $highest->get('sort');
 	
 } else {
-	// Update an existing store
+	
 	$store = $modx->getObject('gmMarker', $id);
 }
 
-$store->fromArray($storeData);
-// Save the store
-$store->save();
+if($store instanceof gmMarker){
+	$storeData['destpage_id'] = $cacheObj->getData($storeData['destpage_id'], 'id', 'modResource', '0');
+	$storeData['resource_id'] = $cacheObj->getData($storeData['resource_id'], 'id', 'modResource', '0');
 
-// Return it
-$storeArray = $store->toArray();
+	$store->fromArray($storeData);
+	// Save the store
+	$store->save();
+
+	// Return it
+	$storeArray = $store->toArray();
+	$out = $modx->error->success('', $storeArray);
+}else{
+	$out = $modx->error->failure($modx->lexicon('markergooglemaps.error_update_store'));
+}
 
 $modx->mgmaps->clearCache();
-return $modx->error->success('', $storeArray);
+return $out;
